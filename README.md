@@ -1,5 +1,4 @@
 # Bloom
-Bloom
 
 🌸 Мой Сад — Bloom Habits
 
