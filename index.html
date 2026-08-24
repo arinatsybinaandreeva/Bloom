@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🌸 Мой Сад Привычек</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#f5f0fa;--card:#fff;--card2:#f0e8f8;--gold:#c8a050;--diamond:#a0c8f0;--accent:#e8a0b0;--text:#3a3040;--text2:#8a8090;--green:#7ecb8a;--font-title:'Playfair Display',serif;--font-body:'Montserrat',sans-serif}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflow-y:auto;padding-bottom:90px;max-width:500px;margin:0 auto;position:relative}
+        #topBar{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.96);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.04)}
+        .garden-name{font-family:var(--font-title);font-size:15px;color:var(--gold);font-weight:700;font-style:italic;cursor:pointer;text-align:center;flex:1}
+        .currency-row{display:flex;gap:6px}
+        .currency{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:14px;font-weight:600;font-size:11px}
+        .coins-bg{background:rgba(200,160,80,.1);color:var(--gold);border:1px solid rgba(200,160,80,.3)}
+        .diamonds-bg{background:rgba(160,200,240,.1);color:var(--diamond);border:1px solid rgba(160,200,240,.3)}
+        .petals-bg{background:rgba(232,160,176,.1);color:var(--accent);border:1px solid rgba(232,160,176,.3)}
+        .screen{display:none;padding:15px;position:relative;z-index:10}.screen.active{display:block}
+        h2{font-family:var(--font-title);color:var(--gold);font-size:22px;margin:12px 0 8px;font-weight:700;font-style:italic}
+        .section-title{font-family:var(--font-title);font-size:15px;color:var(--gold);margin:14px 0 8px;font-weight:600;font-style:italic}
+        .card{background:var(--card);border-radius:12px;padding:12px;margin:6px 0;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
+        .habit-card{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border-radius:12px;margin:8px 0;box-shadow:0 2px 6px rgba(0,0,0,.06);transition:all .3s}
+        .habit-card.done{border:2px solid rgba(126,203,138,.4);background:linear-gradient(135deg,#f5fff5,#f0fff0)}
+        .flower-emoji{font-size:38px;min-width:45px;text-align:center;position:relative}
+        .decor-emoji{position:absolute;top:-10px;right:-10px;font-size:20px}
+        .habit-info{flex:1;min-width:0}.habit-name{font-family:var(--font-title);font-size:15px;font-weight:700;font-style:italic;margin-bottom:2px}
+        .habit-meta{font-size:9px;color:var(--text2);margin:2px 0}
+        .progress-bar{height:6px;background:#eee;border-radius:3px;margin-top:5px;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--accent));border-radius:3px;transition:width .5s}
+        .btn{padding:10px 16px;border-radius:12px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--font-body);white-space:nowrap}
+        .btn:active{transform:scale(.95)}.btn-primary{background:linear-gradient(135deg,var(--green),#5ea86a);color:#fff}
+        .btn-gold{background:linear-gradient(135deg,var(--gold),#b89040);color:#fff}.btn-outline{background:transparent;border:2px solid rgba(0,0,0,.1);color:var(--text)}
+        .btn-sm{padding:7px 14px;font-size:10px;border-radius:8px}.btn-block{width:100%;margin:6px 0;padding:13px}
+        .btn-back{background:#f5f5f5;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:10px}
+        .btn-locked{opacity:.35;pointer-events:none;background:#ddd!important;color:#999!important;border-color:#ccc!important}
+        .shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+        .shop-item{background:var(--card2);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;transition:.2s;border:1px solid rgba(0,0,0,.03);position:relative}
+        .shop-item:active{transform:scale(.93);background:#e8e0f0}.shop-emoji{font-size:28px}.shop-name{font-size:9px;font-weight:600;margin:2px 0}
+        .shop-price{font-size:9px;font-weight:700}.shop-price.coins{color:var(--gold)}.shop-price.diamonds{color:var(--diamond)}
+        .shop-count{position:absolute;top:4px;right:4px;background:var(--gold);color:#fff;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(4px)}
+        .modal.active{display:flex}.modal-content{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:380px;max-height:85vh;overflow-y:auto;border:1px solid rgba(200,160,80,.2)}
+        .modal h3{font-family:var(--font-title);color:var(--gold);margin-bottom:10px;font-size:18px}
+        .modal label{font-size:10px;color:var(--text2);display:block;margin:8px 0 2px}
+        .modal input,.modal select,.modal textarea{width:100%;padding:10px;margin:4px 0;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-size:13px;font-family:var(--font-body);background:#faf8fc}
+        nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);display:flex;justify-content:space-around;padding:8px 2px max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(0,0,0,.05);z-index:100;max-width:500px;margin:0 auto}
+        nav button{background:none;border:none;font-size:8px;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px;font-family:var(--font-body);transition:.2s}
+        nav button.active{color:var(--gold)}nav .nav-icon{font-size:20px}
+        .toast{position:fixed;top:15%;left:50%;transform:translateX(-50%);background:#fff;border:2px solid var(--gold);border-radius:12px;padding:14px 18px;text-align:center;z-index:300;animation:toastIn .4s;box-shadow:0 8px 24px rgba(0,0,0,.15);font-weight:600;font-size:13px;max-width:280px}
+        @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        .level-badge{display:inline-block;background:linear-gradient(135deg,var(--gold),#b89040);color:#fff;padding:5px 14px;border-radius:14px;font-size:12px;font-weight:700;margin:3px}
+        .affirmation{background:linear-gradient(135deg,rgba(200,160,80,.06),rgba(160,200,240,.06));border-radius:12px;padding:12px;text-align:center;margin:8px 0 12px;border:1px solid rgba(200,160,80,.2)}
+        .affirmation p{font-family:var(--font-title);font-size:14px;font-style:italic;color:var(--gold);margin:0}
+        .skill-box{background:var(--card);border-radius:10px;padding:10px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
+        .skill-info{flex:1}.skill-name{font-weight:700;font-size:13px}.skill-desc{font-size:9px;color:var(--text2);margin-top:2px}
+        .skill-level{font-size:11px;color:var(--gold);font-weight:600;margin-right:8px}
+        .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+        .calendar-cell{padding:8px 4px;border-radius:4px;cursor:pointer;font-size:11px;position:relative}
+        .calendar-cell.today{background:var(--gold);color:#fff;font-weight:bold}
+        .calendar-cell.checked{background:rgba(126,203,138,.4)}
+        .calendar-cell.has-note::after{content:'📝';position:absolute;top:1px;right:2px;font-size:8px}
+        .calendar-cell.has-balance::after{content:'🎡';position:absolute;top:1px;right:2px;font-size:8px}
+        .mood-picker{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+        .mood-emoji{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid transparent}
+        .mood-emoji.selected{border-color:var(--gold);background:rgba(200,160,80,.2)}
+        .bottom-btns{position:fixed;bottom:100px;right:8px;z-index:101;display:flex;flex-direction:column-reverse;gap:8px}
+        .bottom-btn{background:rgba(255,255,255,.9);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+        .breath-circle{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(160,200,240,.3),rgba(200,160,80,.1));margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:30px;transition:transform 2s ease-in-out}
+        .breath-circle.inhale{transform:scale(1.4);background:radial-gradient(circle,rgba(126,203,138,.4),rgba(160,200,240,.2))}
+        .breath-circle.exhale{transform:scale(1);background:radial-gradient(circle,rgba(200,160,80,.2),rgba(160,200,240,.1))}
+        .world-fx{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+        .world-fx span{position:absolute;animation:fxFloat 6s infinite;opacity:.15}
+        @keyframes fxFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-30px) rotate(180deg)}}
+        .folder-bar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+        .folder-tag{position:relative;background:var(--card2);border-radius:16px;padding:8px 12px;font-size:11px;cursor:pointer;border:1px solid rgba(0,0,0,.1);display:inline-block}
+        .folder-tag.active{background:var(--gold);color:#fff;border-color:var(--gold)}
+        .folder-delete{position:absolute;top:-6px;right:-6px;background:#e88;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;line-height:1}
+    </style>
+</head>
+<body>
+<div id="topBar">
+    <span style="font-size:26px;cursor:pointer" onclick="showScreen('profile')" id="topAvatar">🌸</span>
+    <span class="garden-name" onclick="renameGarden()" id="gName">Мой Сад</span>
+    <div class="currency-row"><span class="currency coins-bg">🪙 <span id="cAmt">100</span></span><span class="currency diamonds-bg">💎 <span id="dAmt">5</span></span><span class="currency petals-bg">🌸 <span id="pAmt">10</span></span></div>
+</div>
+<div id="worldFx" class="world-fx"></div>
+<div class="bottom-btns"><div class="bottom-btn" id="musicBtn" onclick="toggleMusic()">🎵</div></div>
+
+<div id="app">
+<div class="screen active" id="scGarden">
+    <div class="affirmation"><p id="affText">Я становлюсь лучше с каждым днём</p></div>
+    <div style="text-align:center;margin:8px 0"><span class="level-badge">🌸 Ур. <span id="lvl">1</span></span><span class="level-badge" style="background:linear-gradient(135deg,#e8a0b0,#d08090)">🔥 <span id="strk">0</span> дн.</span></div>
+    <div id="dayInfo" style="text-align:center;font-size:9px;color:var(--text2);margin:4px 0"></div>
+    <div id="habitsContainer"></div>
+    <button class="btn btn-primary btn-block" onclick="showPlant()">🌱 Посадить привычку</button>
+    <div class="section-title">🌟 Развитие навыков</div>
+    <div class="skill-box"><div class="skill-info"><div class="skill-name">💚 Заботливый садовник</div><div class="skill-desc">+10% монет за уровень</div></div><div class="skill-level">Ур. <span id="skCare">0</span>/5</div><button class="btn btn-sm btn-primary" id="btnCare" onclick="upSkill('care')">10 🌸</button></div>
+    <div class="skill-box"><div class="skill-info"><div class="skill-name">🍀 Везучий садовник</div><div class="skill-desc">+5% кристаллов за уровень</div></div><div class="skill-level">Ур. <span id="skLuck">0</span>/5</div><button class="btn btn-sm btn-primary" id="btnLuck" onclick="upSkill('luck')">10 🌸</button></div>
+    <div class="section-title">🎮 Дополнительно</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+        <button class="btn btn-outline btn-sm" id="btnCards" onclick="showCards()">🃏 Карты</button>
+        <button class="btn btn-outline btn-sm" id="btnExpand" onclick="showExpand()">🏡 Участки</button>
+        <button class="btn btn-outline btn-sm" id="btnClub" onclick="showClub()">🏰 Клубы</button>
+        <button class="btn btn-outline btn-sm" id="btnBreath" onclick="startMeditation()">🧘 Дыхание</button>
+        <button class="btn btn-outline btn-sm" id="btnWheel" onclick="startWheel()">🎡 Баланс</button>
+        <button class="btn btn-outline btn-sm" onclick="showStats()">📊 Статы</button>
+        <button class="btn btn-outline btn-sm" onclick="exportS()">💾</button>
+        <button class="btn btn-outline btn-sm" onclick="importS()">📥</button>
+    </div>
+</div>
+<div class="screen" id="scShop"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>🛒 Магазин</h2><div id="shopC"></div></div>
+<div class="screen" id="scQuests"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>📋 Задания</h2><p>Ур.<b id="qLv">1</b></p><div id="questC"></div></div>
+<div class="screen" id="scAch"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>🏆 Достижения</h2><p><b id="achC">0</b></p><div id="achContainer" style="max-height:60vh;overflow-y:auto"></div></div>
+<div class="screen" id="scWorld"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>🌍 Сады</h2><button class="btn btn-gold btn-block" onclick="uploadGarden()">📤 Поделиться</button><div id="worldContainer"></div></div>
+<div class="screen" id="scProfile"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>👤 Профиль</h2><div style="text-align:center;font-size:55px;cursor:pointer" id="profAvatar" onclick="showAvatarPicker()">🌸</div><input id="pName" placeholder="Имя" onchange="G.pn=this.value;save()" style="width:100%;padding:10px;text-align:center;margin:10px 0;border-radius:10px;border:1px solid #ddd"><p>Ур.<b id="pLv">1</b> • Кол.<b id="pGal">0</b> • 🔥<b id="pStr">0</b></p><button class="btn btn-gold btn-block" onclick="showScreen('gallery')">🏛️ Коллекция</button><div class="section-title">🌍 Миры</div><div id="wSel" style="display:flex;gap:6px;flex-wrap:wrap"></div><div class="section-title">🤝 Друзья</div><div id="friendsList"></div></div>
+<div class="screen" id="scGal"><button class="btn-back" onclick="showScreen('profile')">← В профиль</button><h2>🏛️ Коллекция</h2><div id="galC" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div></div>
+<div class="screen" id="scCal"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>📅 Календарь</h2><div style="display:flex;gap:4px;margin:8px 0"><button class="btn btn-sm" onclick="chCal(-1)">◀</button><span id="calT" style="flex:1;text-align:center;font-weight:bold"></span><button class="btn btn-sm" onclick="chCal(1)">▶</button></div><div id="calG"></div><div id="calNoteBox" style="margin-top:8px"></div></div>
+<div class="screen" id="scDiary"><button class="btn-back" onclick="showScreen('garden')">← В сад</button><h2>📔 Дневник</h2><div class="folder-bar" id="fBar"></div><textarea id="dText" placeholder="Что произошло?" style="width:100%;min-height:100px;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,.1);resize:vertical"></textarea><div style="display:flex;gap:6px;margin:6px 0"><button class="btn btn-primary" onclick="saveD()" style="flex:1">💾</button><button class="btn btn-outline" onclick="addF()">📁</button></div><div id="dEnt"></div></div>
+</div>
+
+<nav>
+    <button class="active" onclick="showScreen('garden')"><span class="nav-icon">🌷</span>Сад</button>
+    <button onclick="showScreen('shop')"><span class="nav-icon">🛒</span>Магазин</button>
+    <button onclick="showScreen('quests')"><span class="nav-icon">📋</span>Задания</button>
+    <button onclick="showScreen('achievements')"><span class="nav-icon">🏆</span>Достиж</button>
+    <button onclick="showScreen('world')"><span class="nav-icon">🌍</span>Сады</button>
+    <button onclick="showScreen('calendar')"><span class="nav-icon">📅</span>Календ</button>
+    <button onclick="showScreen('diary')"><span class="nav-icon">📔</span>Дневник</button>
+</nav>
+
+<div class="modal" id="mPlant"><div class="modal-content"><h3>🌱 Новая привычка</h3><label>Название</label><input id="plN"><label>Имя цветка</label><input id="plF"><label>🌸 Цветок</label><select id="plT"></select><label>🏺 Горшок</label><select id="plP"></select><label>🎀 Украшение</label><select id="plD"></select><label>🐾 Питомец</label><select id="plPet"></select><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-outline" onclick="closeM('mPlant')">Отмена</button><button class="btn btn-primary" onclick="plant()" style="flex:1">Посадить</button></div></div></div>
+<div class="modal" id="mRitual"><div class="modal-content" style="text-align:center"><div style="font-size:60px" id="rEm">💧</div><h3 id="rNm">Полить</h3><button class="btn btn-primary btn-block" onclick="doR()">✨ Подтвердить</button></div></div>
+<div class="modal" id="mConfirm"><div class="modal-content" style="text-align:center"><h3 id="cfT"></h3><p id="cfM"></p><div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="closeM('mConfirm')">Отмена</button><button class="btn btn-primary" id="cfY" style="flex:1">Подтвердить</button></div></div></div>
+<div class="modal" id="mCalNote"><div class="modal-content"><h3>📝 <span id="cnDate"></span></h3><div class="mood-picker" id="moodPick"></div><textarea id="cnText"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-outline" onclick="closeM('mCalNote')">Отмена</button><button class="btn btn-primary" onclick="saveCalNote()" style="flex:1">💾</button></div></div></div>
+<div class="modal" id="mAvatar"><div class="modal-content"><h3>🌸 Аватар</h3><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px" id="avatarGrid"></div><button class="btn btn-outline btn-block" onclick="closeM('mAvatar')">Закрыть</button></div></div>
+<div class="modal" id="mMove"><div class="modal-content"><h3>📁 Переместить</h3><div id="moveList"></div><input type="hidden" id="moveId"><button class="btn btn-outline btn-block" onclick="closeM('mMove')">Закрыть</button></div></div>
+
+<script>
+const K='bloomG_v27';
+const ST=[{n:'Семечко',e:'🌰',d:0,r:0},{n:'Росток',e:'🌱',d:5,r:2},{n:'Укоренение',e:'🌿',d:14,r:5},{n:'Бутонизация',e:'🪴',d:30,r:10},{n:'Цветение',e:'🌸',d:60,r:20},{n:'Пышное',e:'🌺',d:90,r:35},{n:'Мастер',e:'👑',d:254,r:100}];
+const RT=['💧 Полить','✂️ Подрезать','💨 Опрыскать','☀️ К солнцу','🧪 Удобрить','💕 Поговорить','🐞 Защитить','🌬️ Проветрить'];
+const MOODS=['😊','😢','😡','😴','🤩','😍','🥳','😰','🤔','😎','🥰','😤','😇','🤗'];
+const AVATARS=['🌸','🌺','🌻','🌹','🌷','🌼','💮','🪷','🌾','🍀','🌿','🪴','💎','✨','🌟','⭐','🌈','💫','🦋','🐝','🐞','🐌','🦊','🐰','🐱','🐶','🐼','🐨','🦄','🐉','🐸','🦢','🦚','🐳','🐬','🪸','🍄','🌵','🎋','🎍','💐','🥀','🍁','🫧','💠','🔮','🎭','💜','🤍'];
+const AFFIRMATIONS=["Я становлюсь лучше с каждым днём","Мои привычки создают моё будущее","Я достоин успеха и счастья","Каждый день — шаг к мечте","Моя дисциплина — суперсила","Я притягиваю позитивные изменения","Моё здоровье и энергия растут","Я благодарен за этот день"];
+const BN=['Анна','Мария','Елена','Ольга','Наталья','Екатерина','София','Виктория','Дарья','Ирина','Юлия','Татьяна','Ксения','Полина','Алёна'];
+const BA=['🌸','🌺','🌻','🌹','🌷','🌼','💮','🪷','🌾','🍀','🌿','🪴','💎','✨','🌟'];
+
+const FL=[{id:'d',n:'Росток',e:'🌱',p:0,c:'free',inc:1,ct:'coins'},{id:'f1',n:'Маргаритка',e:'🌼',p:10,c:'coins',inc:1},{id:'f2',n:'Клевер',e:'🍀',p:20,c:'coins',inc:2},{id:'f3',n:'Тюльпан',e:'🌷',p:35,c:'coins',inc:3},{id:'f4',n:'Подсолнух',e:'🌻',p:55,c:'coins',inc:5},{id:'f5',n:'Нарцисс',e:'🏵️',p:85,c:'coins',inc:8},{id:'f6',n:'Бархатцы',e:'💮',p:130,c:'coins',inc:12},{id:'f7',n:'Колокольчик',e:'🪻',p:200,c:'coins',inc:18},{id:'f8',n:'Роза',e:'🌹',p:300,c:'coins',inc:28},{id:'f9',n:'Лаванда',e:'💐',p:450,c:'coins',inc:42},{id:'f10',n:'Настурция',e:'🌺',p:700,c:'coins',inc:65},{id:'f11',n:'Цинния',e:'🌾',p:1100,c:'coins',inc:100},{id:'f12',n:'Гиацинт',e:'🪷',p:1700,c:'coins',inc:155},{id:'f13',n:'Мак',e:'🥀',p:2600,c:'coins',inc:240},{id:'f14',n:'Сирень',e:'🟣',p:4000,c:'coins',inc:370},{id:'f15',n:'Вербена',e:'🌿',p:6000,c:'coins',inc:560},{id:'f16',n:'Розовая роза',e:'💗',p:9000,c:'coins',inc:850},{id:'d1',n:'Орхидея',e:'🩷',p:3,c:'diamonds',inc:1,ct:'diamonds'},{id:'d2',n:'Гардения',e:'🤎',p:8,c:'diamonds',inc:2,ct:'diamonds'},{id:'d3',n:'Лилия',e:'🩵',p:20,c:'diamonds',inc:5,ct:'diamonds'},{id:'d4',n:'Амариллис',e:'❤️',p:50,c:'diamonds',inc:12,ct:'diamonds'},{id:'d5',n:'Олеандр',e:'💚',p:120,c:'diamonds',inc:28,ct:'diamonds'},{id:'d6',n:'Лотос',e:'💙',p:300,c:'diamonds',inc:70,ct:'diamonds'},{id:'d7',n:'Голубая роза',e:'🌀',p:350,c:'diamonds',inc:80,ct:'diamonds'},{id:'d8',n:'Золотая роза',e:'👑',p:650,c:'diamonds',inc:150,ct:'diamonds'},{id:'d9',n:'Рододендрон',e:'💛',p:750,c:'diamonds',inc:175,ct:'diamonds'},{id:'d10',n:'Радужная роза',e:'🌈',p:1200,c:'diamonds',inc:280,ct:'diamonds'},{id:'d11',n:'Сакура',e:'🧡',p:1800,c:'diamonds',inc:420,ct:'diamonds'},{id:'d12',n:'Лунный цветок',e:'🌙',p:2500,c:'diamonds',inc:590,ct:'diamonds'},{id:'d13',n:'Магнолия',e:'🩶',p:4500,c:'diamonds',inc:1050,ct:'diamonds'},{id:'d14',n:'Звёздная лилия',e:'⭐',p:5000,c:'diamonds',inc:1200,ct:'diamonds'},{id:'d15',n:'Огненная роза',e:'🔥',p:10000,c:'diamonds',inc:2500,ct:'diamonds'},{id:'d16',n:'Глициния',e:'💫',p:11000,c:'diamonds',inc:2600,ct:'diamonds'},{id:'d17',n:'Алмазная роза',e:'💠',p:20000,c:'diamonds',inc:5000,ct:'diamonds'},{id:'d18',n:'Космо',e:'🌌',p:50000,c:'diamonds',inc:12000,ct:'diamonds'},{id:'d19',n:'Эдем',e:'✨',p:100000,c:'diamonds',inc:25000,ct:'diamonds'},{id:'d20',n:'Вечность',e:'♾️',p:250000,c:'diamonds',inc:60000,ct:'diamonds'}];
+const PT=[{id:'d',n:'Простой',e:'🪴',p:0,c:'free',color:'#f0e8f8'},{id:'p1',n:'Глина',e:'🧱',p:15,c:'coins',color:'#e8d5c0'},{id:'p2',n:'Дерево',e:'🪵',p:30,c:'coins',color:'#d4c4a8'},{id:'p3',n:'Терракота',e:'🏺',p:55,c:'coins',color:'#e0c8b0'},{id:'p4',n:'Медь',e:'🪙',p:90,c:'coins',color:'#e8d0b0'},{id:'p5',n:'Бронза',e:'🥉',p:150,c:'coins',color:'#e0c8a0'},{id:'p6',n:'Бамбук',e:'🎋',p:240,c:'coins',color:'#d8e8c8'},{id:'p7',n:'Мрамор',e:'🗿',p:380,c:'coins',color:'#e8e8e8'},{id:'p8',n:'Серебро',e:'🥈',p:600,c:'coins',color:'#e0e0e8'},{id:'p9',n:'Золотой',e:'🏆',p:950,c:'coins',color:'#f0e8c0'},{id:'p10',n:'Стекло',e:'🫗',p:5,c:'diamonds',color:'#e8f0f8'},{id:'p11',n:'Хрусталь',e:'💎',p:15,c:'diamonds',color:'#f0e8ff'},{id:'p12',n:'Радужный',e:'🌈',p:40,c:'diamonds',color:'#f8e8f0'},{id:'p13',n:'Жемчуг',e:'🫧',p:100,c:'diamonds',color:'#f8f0f0'},{id:'p14',n:'Аметист',e:'💜',p:250,c:'diamonds',color:'#e8d8f0'},{id:'p15',n:'Изумруд',e:'💚',p:600,c:'diamonds',color:'#c8e8d8'},{id:'p16',n:'Рубин',e:'❤️',p:1500,c:'diamonds',color:'#f0d0d0'},{id:'p17',n:'Обсидиан',e:'🖤',p:3800,c:'diamonds',color:'#d8d8e0'},{id:'p18',n:'Платина',e:'🩶',p:9500,c:'diamonds',color:'#e8e8f0'},{id:'p19',n:'Опал',e:'🤍',p:24000,c:'diamonds',color:'#f0e8e8'},{id:'p20',n:'Песчаник',e:'🏜️',p:35,c:'coins',color:'#e8d8c0'},{id:'p21',n:'Гранит',e:'🪦',p:65,c:'coins',color:'#d0d0c8'},{id:'p22',n:'Базальт',e:'🗻',p:100,c:'coins',color:'#c8c8c0'},{id:'p23',n:'Яшма',e:'🟢',p:180,c:'coins',color:'#c8e0c0'},{id:'p24',n:'Малахит',e:'🟤',p:350,c:'coins',color:'#c8e0d0'},{id:'p25',n:'Бирюза',e:'🩵',p:280,c:'coins',color:'#c8e0e0'},{id:'p26',n:'Янтарь',e:'🧡',p:200,c:'coins',color:'#f0d8b0'},{id:'p27',n:'Оникс',e:'⬛',p:450,c:'coins',color:'#d0d0d8'},{id:'p28',n:'Кварц',e:'🔮',p:180,c:'coins',color:'#f0e8ff'},{id:'p29',n:'Коралл',e:'🪸',p:220,c:'coins',color:'#f0d8d0'}];
+const DC=[{id:'none',n:'Нет',e:'',p:0,c:'free'},{id:'dc1',n:'Лента',e:'🎀',p:12,c:'coins'},{id:'dc2',n:'Звёзды',e:'⭐',p:25,c:'coins'},{id:'dc3',n:'Гирлянда',e:'💡',p:45,c:'coins'},{id:'dc4',n:'Бант',e:'🎗️',p:70,c:'coins'},{id:'dc5',n:'Колокольчик',e:'🔔',p:110,c:'coins'},{id:'dc6',n:'Флажок',e:'🚩',p:160,c:'coins'},{id:'dc7',n:'Свеча',e:'🕯️',p:230,c:'coins'},{id:'dc8',n:'Клевер',e:'☘️',p:340,c:'coins'},{id:'dc9',n:'Подкова',e:'🧲',p:500,c:'coins'},{id:'dc10',n:'Перо',e:'🪶',p:750,c:'coins'},{id:'dc11',n:'Монетка',e:'💲',p:1100,c:'coins'},{id:'dc12',n:'Брошь',e:'📎',p:35,c:'coins'},{id:'dc13',n:'Пуговица',e:'🔘',p:55,c:'coins'},{id:'dc14',n:'Бусина',e:'🟡',p:80,c:'coins'},{id:'dc15',n:'Кольцо',e:'💍',p:130,c:'coins'},{id:'dd1',n:'Самоцвет',e:'🔶',p:5,c:'diamonds'},{id:'dd2',n:'Корона',e:'🤴',p:30,c:'diamonds'},{id:'dd3',n:'Бриллианты',e:'💎',p:80,c:'diamonds'},{id:'dd4',n:'Радуга',e:'🌈',p:60,c:'diamonds'},{id:'dd5',n:'Жемчуг',e:'🫧',p:50,c:'diamonds'},{id:'dd6',n:'Золотая пыль',e:'✨',p:150,c:'diamonds'},{id:'dd7',n:'Конфетти',e:'🎉',p:40,c:'diamonds'},{id:'dd8',n:'Сердечки',e:'💕',p:50,c:'diamonds'},{id:'dd9',n:'Бабочки',e:'🦋',p:85,c:'diamonds'},{id:'dd10',n:'Снежинки',e:'❄️',p:90,c:'diamonds'},{id:'dd11',n:'Кружево',e:'🕸️',p:140,c:'diamonds'},{id:'dd12',n:'Блёстки',e:'🎊',p:145,c:'diamonds'},{id:'dd13',n:'Нимб',e:'😇',p:300,c:'diamonds'},{id:'dd14',n:'Крылья',e:'🪽',p:500,c:'diamonds'}];
+const PS=[{id:'none',n:'Нет',e:'',p:0,c:'free'},{id:'ps1',n:'Улитка',e:'🐌',p:8,c:'coins'},{id:'ps2',n:'Пчёлка',e:'🐝',p:18,c:'coins'},{id:'ps3',n:'Коровка',e:'🐞',p:35,c:'coins'},{id:'ps4',n:'Лягушка',e:'🐸',p:65,c:'coins'},{id:'ps5',n:'Белка',e:'🐿️',p:120,c:'coins'},{id:'ps6',n:'Зайчик',e:'🐰',p:220,c:'coins'},{id:'ps7',n:'Котик',e:'🐱',p:400,c:'coins'},{id:'ps8',n:'Хомяк',e:'🐹',p:750,c:'coins'},{id:'ps9',n:'Собачка',e:'🐕',p:1400,c:'coins'},{id:'ps10',n:'Птичка',e:'🐦',p:2600,c:'coins'},{id:'ps11',n:'Рыбка',e:'🐠',p:5000,c:'coins'},{id:'ps12',n:'Цыплёнок',e:'🐤',p:15,c:'coins'},{id:'ps13',n:'Утёнок',e:'🐥',p:25,c:'coins'},{id:'ps14',n:'Мышка',e:'🐭',p:45,c:'coins'},{id:'ps15',n:'Хорёк',e:'🐾',p:80,c:'coins'},{id:'ps16',n:'Кролик',e:'🐇',p:150,c:'coins'},{id:'ps17',n:'Енот',e:'🦝',p:280,c:'coins'},{id:'pd1',n:'Бабочка',e:'🦋',p:6,c:'diamonds'},{id:'pd2',n:'Лисёнок',e:'🦊',p:25,c:'diamonds'},{id:'pd3',n:'Оленёнок',e:'🦌',p:70,c:'diamonds'},{id:'pd4',n:'Коала',e:'🐨',p:180,c:'diamonds'},{id:'pd5',n:'Дракон',e:'🐉',p:450,c:'diamonds'},{id:'pd6',n:'Феникс',e:'🔥',p:1100,c:'diamonds'},{id:'pd7',n:'Единорог',e:'🦄',p:2800,c:'diamonds'},{id:'pd8',n:'Лебедь',e:'🦢',p:600,c:'diamonds'},{id:'pd9',n:'Павлин',e:'🦚',p:900,c:'diamonds'},{id:'pd10',n:'Сова',e:'🦉',p:250,c:'diamonds'},{id:'pd11',n:'Черепаха',e:'🐢',p:150,c:'diamonds'},{id:'pd12',n:'Колибри',e:'🐧',p:200,c:'diamonds'},{id:'pd13',n:'Ёжик',e:'🦔',p:160,c:'diamonds'},{id:'pd14',n:'Ленивец',e:'🦥',p:220,c:'diamonds'},{id:'pd15',n:'Фламинго',e:'🦩',p:500,c:'diamonds'},{id:'pd16',n:'Попугай',e:'🦜',p:320,c:'diamonds'},{id:'pd17',n:'Аксолотль',e:'🐲',p:380,c:'diamonds'}];
+const WL=[{id:'d',n:'Поляна',e:'🌿',p:0,c:'free',bg:'#f5f0fa',fx:''},{id:'w1',n:'Сакура',e:'🌸',p:5,c:'diamonds',bg:'#fff0f5',fx:'🌸'},{id:'w2',n:'Луна',e:'🌙',p:12,c:'diamonds',bg:'#e8eaf6',fx:'⭐'},{id:'w3',n:'Океан',e:'🌊',p:30,c:'diamonds',bg:'#e0f0fa',fx:'🌊'},{id:'w4',n:'Космос',e:'🌌',p:75,c:'diamonds',bg:'#1a1a2e',fx:'✨'},{id:'w5',n:'Закат',e:'🌅',p:180,c:'diamonds',bg:'#faf0e0',fx:'☀️'},{id:'w6',n:'Джунгли',e:'🌴',p:450,c:'diamonds',bg:'#e0f0e0',fx:'🍃'},{id:'w7',n:'Хрусталь',e:'💎',p:1100,c:'diamonds',bg:'#f0f0ff',fx:'💎'},{id:'w8',n:'Аврора',e:'🌈',p:2800,c:'diamonds',bg:'#e0f0f0',fx:'🌈'},{id:'w9',n:'Эдем',e:'💫',p:7000,c:'diamonds',bg:'#e8ffe8',fx:'✨'},{id:'w10',n:'Пустыня',e:'🏜️',p:120,c:'diamonds',bg:'#faf5e8',fx:'🏜️'},{id:'w11',n:'Тундра',e:'❄️',p:160,c:'diamonds',bg:'#f0f0ff',fx:'❄️'},{id:'w12',n:'Вишня',e:'🍒',p:280,c:'diamonds',bg:'#fff0f5',fx:'🍒'},{id:'w13',n:'Лаванда',e:'💜',p:130,c:'diamonds',bg:'#f5f0fa',fx:'💜'},{id:'w14',n:'Подсолнухи',e:'🌻',p:200,c:'diamonds',bg:'#fffde0',fx:'🌻'},{id:'w15',n:'Розарий',e:'🌹',p:320,c:'diamonds',bg:'#fff0f5',fx:'🌹'},{id:'w16',n:'Звёзды',e:'🌃',p:3000,c:'diamonds',bg:'#1a1a2e',fx:'⭐'},{id:'w17',n:'Горы',e:'🏔️',p:900,c:'diamonds',bg:'#e8e8e8',fx:'🏔️'},{id:'w18',n:'Кораллы',e:'🪸',p:1500,c:'diamonds',bg:'#ffe8e0',fx:'🪸'},{id:'w19',n:'Облака',e:'☁️',p:750,c:'diamonds',bg:'#f8f8ff',fx:'☁️'},{id:'w20',n:'Вулкан',e:'🌋',p:1600,c:'diamonds',bg:'#fae8e0',fx:'🌋'},{id:'w21',n:'Водопад',e:'💧',p:1100,c:'diamonds',bg:'#e0f0ff',fx:'💧'},{id:'w22',n:'Луг',e:'🌾',p:8,c:'diamonds',bg:'#f5faf0',fx:'🌾'},{id:'w23',n:'Фруктовый сад',e:'🍎',p:50,c:'diamonds',bg:'#fff5f0',fx:'🍎'},{id:'w24',n:'Виноградник',e:'🍇',p:85,c:'diamonds',bg:'#f8f0f8',fx:'🍇'},{id:'w25',n:'Тайга',e:'🌲',p:300,c:'diamonds',bg:'#e8f0e8',fx:'🌲'},{id:'w26',n:'Саванна',e:'🦒',p:600,c:'diamonds',bg:'#faf5e8',fx:'🦒'},{id:'w27',n:'Мангры',e:'🌿',p:520,c:'diamonds',bg:'#d8e8d8',fx:'🌿'},{id:'w28',n:'Ледник',e:'🧊',p:950,c:'diamonds',bg:'#f0f8ff',fx:'🧊'},{id:'w29',n:'Пещера',e:'🕳️',p:600,c:'diamonds',bg:'#e8e8e8',fx:'🕳️'}];
+
+let G={coins:100,diamonds:5,petals:10,maxSlots:8,gardenName:'Мой Сад',gardenQuote:'',pn:'',pa:'🌸',habits:[],gallery:[],achievements:[],questLevel:0,questsCompleted:[],streak:0,lastDate:'',currentWorld:'d',calendar:{},calNotes:{},diary:[],diaryFolders:['Общее'],currentFolder:'Общее',inv:{flowers:['d'],pots:['d'],decorations:['none'],pets:['none'],worlds:['d']},skillLevels:{care:0,luck:0},autoWater:{},gardenPlots:1,collectionCards:[],prestigeBonuses:{},legendaryCollection:[],clubMembership:null,gardenColor:'#f5f0fa',friends:[],likedGardens:[],lastWheelDate:'',wheelHistory:{},lastBreathTime:0,musicOn:true,gardenPublished:false};
+
+function loadGame(){
+    const saved=localStorage.getItem(K);
+    if(saved){try{const parsed=JSON.parse(saved);G={...G,...parsed};}catch(e){console.error('Ошибка загрузки:',e)}}
+    if(!G.inv)G.inv={flowers:['d'],pots:['d'],decorations:['none'],pets:['none'],worlds:['d']};
+    if(!G.friends)G.friends=[];
+    if(!G.likedGardens)G.likedGardens=[];
+    if(!G.calNotes)G.calNotes={};
+    if(!G.wheelHistory)G.wheelHistory={};
+    if(typeof G.gardenPublished==='undefined')G.gardenPublished=false;
+    ['flowers','pots','decorations','pets','worlds'].forEach(k=>{if(!G.inv[k]||!Array.isArray(G.inv[k]))G.inv[k]=k==='decorations'||k==='pets'?['none']:['d'];});
+}
+
+function save(){localStorage.setItem(K,JSON.stringify(G));checkA();checkQ();updateUI();}
+function getStage(d){for(let i=ST.length-1;i>=0;i--){if(d>=ST[i].d)return{...ST[i],idx:i}}return{...ST[0],idx:0}}
+function getLevel(){const t=G.habits.reduce((s,h)=>s+h.days,0)+(G.gallery||[]).reduce((s,h)=>s+(h.days||0),0);return Math.floor(t/30)+1}
+function showToast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1800);}
+function showM(id){document.getElementById(id).classList.add('active');}
+function closeM(id){document.getElementById(id).classList.remove('active');}
+let cc=null;
+function confirm(t,m,cb){document.getElementById('cfT').textContent=t;document.getElementById('cfM').textContent=m;cc=cb;document.getElementById('cfY').onclick=()=>{closeM('mConfirm');if(cc){cc();cc=null;}};showM('mConfirm');}
+
+function applyWorld(id){
+    const w=WL.find(x=>x.id===id)||WL[0];
+    document.body.style.background=w.bg;
+    document.documentElement.style.setProperty('--bg',w.bg);
+    const fx=document.getElementById('worldFx');fx.innerHTML='';
+    if(w.fx){for(let i=0;i<6;i++){const s=document.createElement('span');s.textContent=w.fx;s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.fontSize=(20+Math.random()*20)+'px';s.style.animationDelay=Math.random()*5+'s';fx.appendChild(s);}}
+}
+
+function updateUI(){
+    document.getElementById('cAmt').textContent=G.coins;
+    document.getElementById('dAmt').textContent=G.diamonds;
+    document.getElementById('pAmt').textContent=G.petals;
+    document.getElementById('lvl').textContent=getLevel();
+    document.getElementById('strk').textContent=G.streak||0;
+    document.getElementById('gName').textContent=G.gardenQuote?`Мой Сад «${G.gardenQuote}»`:'Мой Сад';
+    document.getElementById('topAvatar').textContent=G.pa||'🌸';
+    document.getElementById('profAvatar').textContent=G.pa||'🌸';
+    document.getElementById('pName').value=G.pn||'';
+    document.getElementById('skCare').textContent=G.skillLevels?.care||0;
+    document.getElementById('skLuck').textContent=G.skillLevels?.luck||0;
+    document.getElementById('pLv').textContent=getLevel();
+    document.getElementById('pGal').textContent=(G.gallery||[]).length;
+    document.getElementById('pStr').textContent=G.streak||0;
+    const careCost=10+(G.skillLevels?.care||0)*5;
+    const luckCost=10+(G.skillLevels?.luck||0)*5;
+    document.getElementById('btnCare').textContent=(G.skillLevels?.care>=5?'Макс':careCost+' 🌸');
+    document.getElementById('btnLuck').textContent=(G.skillLevels?.luck>=5?'Макс':luckCost+' 🌸');
+    const today=new Date().toDateString();
+    const affIdx=Math.floor((G.habits.reduce((s,h)=>s+h.days,0)+new Date(today).getTime())%AFFIRMATIONS.length);
+    document.getElementById('affText').textContent=AFFIRMATIONS[Math.abs(affIdx)%AFFIRMATIONS.length];
+    const n=new Date();n.setHours(24,0,0,0);const d=n-new Date();
+    document.getElementById('dayInfo').textContent=`⏰ Новый день через ${Math.floor(d/3600000)} ч ${Math.floor((d%3600000)/60000)} мин`;
+    applyWorld(G.currentWorld);
+    document.getElementById('musicBtn').textContent=G.musicOn?'🎵':'🔇';
+    const lv=getLevel();
+    document.getElementById('btnCards').className=lv>=10?'btn btn-outline btn-sm':'btn btn-outline btn-sm btn-locked';
+    document.getElementById('btnExpand').className=lv>=15?'btn btn-outline btn-sm':'btn btn-outline btn-sm btn-locked';
+    document.getElementById('btnClub').className=lv>=15?'btn btn-outline btn-sm':'btn btn-outline btn-sm btn-locked';
+    document.getElementById('btnWheel').className=(G.lastWheelDate===today)?'btn btn-outline btn-sm btn-locked':'btn btn-outline btn-sm';
+    document.getElementById('btnWheel').textContent=(G.lastWheelDate===today)?'🎡 Готово':'🎡 Баланс';
+    const breathReady=(Date.now()-(G.lastBreathTime||0))>300000;
+    document.getElementById('btnBreath').className=breathReady?'btn btn-outline btn-sm':'btn btn-outline btn-sm btn-locked';
+    document.getElementById('btnBreath').textContent=breathReady?'🧘 Дыхание':'🧘 Подожди';
+}
+
+let AC=null;
+function iAC(){if(AC)return AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return AC;}
+function rAC(){const c=iAC();if(c&&c.state==='suspended')c.resume().catch(()=>{});return c;}
+function sfx(f,d,v,t){const c=rAC();if(!c||c.state!=='running')return;try{const o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.setValueAtTime(f,c.currentTime);g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d+.01);}catch(e){}}
+function pClick(){sfx(880,.04,.18);setTimeout(()=>sfx(660,.05,.18),12);}
+function pWater(){sfx(240,.16,.20,'triangle');setTimeout(()=>sfx(320,.12,.18,'triangle'),60);}
+let mActive=false,mInterval=null,mIdx=0;const mel=[[262,.6],[330,.5],[392,.7],[330,.5],[294,.6],[349,.5],[440,.7],[349,.5]];
+function mTick(){if(!mActive||!G||!G.musicOn)return;const[f,d]=mel[mIdx%mel.length];mIdx++;sfx(f,d,.25,'sine');}
+function startMusic(){if(mActive||!G||!G.musicOn)return;const ctx=rAC();if(!ctx){setTimeout(startMusic,500);return;}mActive=true;mIdx=0;if(mInterval)clearInterval(mInterval);mTick();mInterval=setInterval(mTick,450);}
+function stopMusic(){mActive=false;if(mInterval){clearInterval(mInterval);mInterval=null;}}
+function toggleMusic(){if(!G)return;G.musicOn=!G.musicOn;if(G.musicOn){mActive=false;startMusic();}else{stopMusic();}save();updateUI();}
+document.addEventListener('click',e=>{if(e.target.closest('button'))pClick();if(G&&G.musicOn&&!mActive){const c=rAC();if(c&&c.state==='suspended')c.resume().catch(()=>{});startMusic();}});
+
+let cs='garden';
+function showScreen(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const map={garden:'scGarden',shop:'scShop',quests:'scQuests',achievements:'scAch',world:'scWorld',profile:'scProfile',gallery:'scGal',calendar:'scCal',diary:'scDiary'};
+    const id=map[name];if(id){document.getElementById(id).classList.add('active');cs=name;}
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    const nm={garden:0,shop:1,quests:2,achievements:3,world:4,calendar:5,diary:6};
+    const btns=document.querySelectorAll('nav button');if(nm[name]!==undefined&&btns[nm[name]])btns[nm[name]].classList.add('active');
+    updateUI();
+    if(name==='garden')renderGarden();
+    if(name==='shop')renderShop();
+    if(name==='quests')renderQ();
+    if(name==='achievements')renderA();
+    if(name==='world')renderWorld();
+    if(name==='profile')renderP();
+    if(name==='gallery')renderGal();
+    if(name==='calendar')renderCal();
+    if(name==='diary')renderD();
+}
+
+function gPC(id){const pot=PT.find(p=>p.id===id);return pot?pot.color:'#f0e8f8';}
+
+function renderGarden(){
+    const c=document.getElementById('habitsContainer'),today=new Date().toDateString();
+    if(!G.habits.length){c.innerHTML='<div class="card" style="text-align:center;padding:30px"><div style="font-size:50px">🌱</div><p>Посадите первую привычку!</p></div>';return;}
+    c.innerHTML=G.habits.map((h,i)=>{
+        const st=getStage(h.days),p=Math.min((h.days/90)*100,100),done=h.lastDone===today;
+        const f=FL.find(x=>x.id===h.flowerType)||FL[0];
+        const pe=h.pet&&h.pet!=='none'?(PS.find(x=>x.id===h.pet)?.e||''):'';
+        const de=h.decor&&h.decor!=='none'?(DC.find(x=>x.id===h.decor)?.e||''):'';
+        const inc=f.ct==='diamonds'?`<span style="color:var(--diamond)">+${f.inc}💎/д</span>`:`<span style="color:var(--green)">+${f.inc}🪙/д</span>`;
+        const auto=G.autoWater[i],prestige=h.days>=254;
+        return `<div class="habit-card${done?' done':''}" style="background:${gPC(h.pot||'d')}">
+            <div class="flower-emoji">${st.e}${pe}${de?`<span class="decor-emoji">${de}</span>`:''}</div>
+            <div class="habit-info">
+                <div class="habit-name">${h.flowerName||h.name}</div>
+                <div class="habit-meta">📋 ${h.name} • ${f.e} ${f.n} • ${inc}${auto?' 🤖':''}</div>
+                <div class="habit-meta">${st.n} • День ${h.days}/90</div>
+                ${!done&&h.daysSinceWatered>=3?`<div style="color:red;font-size:9px">⚠️ ${h.daysSinceWatered} дн.</div>`:''}
+                <div class="progress-bar"><div class="progress-fill" style="width:${p}%"></div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+                ${prestige?`<button class="btn btn-sm btn-gold" onclick="event.stopPropagation();prestige(${i})">🌟</button>`:''}
+                <button class="btn btn-sm ${auto?'btn-gold':'btn-outline'}" onclick="event.stopPropagation();tAuto(${i})">🤖</button>
+                ${!done?`<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();startR(${i})">💧</button>`:'<span style="color:green;font-size:18px">✓</span>'}
+                ${h.days>=90?`<button class="btn btn-sm btn-gold" onclick="event.stopPropagation();harvest(${i})">✂️</button>`:''}
+                <button class="btn btn-sm" style="color:red;font-size:9px" onclick="event.stopPropagation();delH(${i})">🗑️</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function showPlant(){
+    if(G.habits.length>=G.maxSlots){alert('Нет слотов!');return;}
+    document.getElementById('plT').innerHTML=FL.filter(x=>G.inv.flowers.includes(x.id)).map(x=>`<option value="${x.id}">${x.e} ${x.n}</option>`).join('');
+    document.getElementById('plP').innerHTML=PT.filter(x=>G.inv.pots.includes(x.id)).map(x=>`<option value="${x.id}">${x.e} ${x.n}</option>`).join('');
+    document.getElementById('plD').innerHTML=DC.filter(x=>G.inv.decorations.includes(x.id)).map(x=>`<option value="${x.id}">${x.e||'—'} ${x.n}</option>`).join('');
+    document.getElementById('plPet').innerHTML=PS.filter(x=>G.inv.pets.includes(x.id)).map(x=>`<option value="${x.id}">${x.e||'—'} ${x.n}</option>`).join('');
+    document.getElementById('plN').value='';document.getElementById('plF').value='';showM('mPlant');
+}
+
+function plant(){
+    const n=document.getElementById('plN').value.trim(),k=document.getElementById('plF').value.trim();
+    if(!n){alert('Введите название!');return;}
+    const flowerType=document.getElementById('plT').value;
+    const pot=document.getElementById('plP').value;
+    const decor=document.getElementById('plD').value;
+    const pet=document.getElementById('plPet').value;
+    if(flowerType!=='d'){const idx=G.inv.flowers.indexOf(flowerType);if(idx===-1){alert('Нет такого цветка!');return;}G.inv.flowers.splice(idx,1);}
+    if(pot!=='d'){const idx=G.inv.pots.indexOf(pot);if(idx===-1){alert('Нет такого горшка!');return;}G.inv.pots.splice(idx,1);}
+    if(decor!=='none'){const idx=G.inv.decorations.indexOf(decor);if(idx===-1){alert('Нет такого украшения!');return;}G.inv.decorations.splice(idx,1);}
+    if(pet!=='none'){const idx=G.inv.pets.indexOf(pet);if(idx===-1){alert('Нет такого питомца!');return;}G.inv.pets.splice(idx,1);}
+    G.habits.push({name:n,flowerName:k||n,days:0,lastDone:'',daysSinceWatered:0,flowerType,pot,decor,pet});
+    closeM('mPlant');save();showToast('🌱 Посажено!');renderGarden();
+}
+
+function startR(i){if(!G.habits[i]||G.habits[i].lastDone===new Date().toDateString()){showToast('Уже полито!');return;}G.rI=i;const r=RT[Math.floor(Math.random()*RT.length)];document.getElementById('rEm').textContent=r.split(' ')[0];document.getElementById('rNm').textContent=r;showM('mRitual');}
+function doR(){if(G.rI===undefined)return;const i=G.rI,h=G.habits[i],today=new Date().toDateString();if(h.lastDone===today){closeM('mRitual');G.rI=undefined;return;}h.days++;h.lastDone=today;h.daysSinceWatered=0;G.calendar[today]=true;const f=FL.find(x=>x.id===h.flowerType)||FL[0],mult=1+(G.skillLevels?.care||0)*0.1;if(f.ct==='diamonds')G.diamonds+=Math.floor(f.inc*mult);else G.coins+=Math.floor(f.inc*mult);G.petals++;const ns=getStage(h.days),os=getStage(h.days-1);if(ns.idx>os.idx){if(f.ct==='diamonds'){G.diamonds+=ns.r;showToast(`${ns.e} ${ns.n}! +${ns.r}💎`);}else{G.coins+=ns.r;showToast(`${ns.e} ${ns.n}! +${ns.r}🪙`);}}if(h.days>=90)showToast('🌸 Созрел!');if(h.days%30===0){G.petals+=3;showToast('🌸 +3 лепестка!');}pWater();closeM('mRitual');G.rI=undefined;save();renderGarden();}
+function harvest(i){const h=G.habits[i];if(h.days<90){alert('90 дней!');return;}G.gallery.push({name:h.name,fn:h.flowerName,days:h.days,date:new Date().toLocaleDateString('ru-RU')});G.diamonds+=3;G.petals+=5;G.habits.splice(i,1);delete G.autoWater[i];save();showToast('🏛️ +3💎 +5🌸');renderGarden();}
+function delH(i){if(confirm(`Удалить "${G.habits[i].flowerName}"?`)){G.habits.splice(i,1);delete G.autoWater[i];save();showToast('🗑️ Удалено');renderGarden();}}
+function tAuto(i){if(G.autoWater[i]){delete G.autoWater[i];save();showToast('Автополив выкл');}else{if(G.coins<50){alert('50🪙!');return;}confirm('Автополив','Включить за 50🪙?',()=>{G.coins-=50;G.autoWater[i]=true;save();showToast('🤖 Вкл!');});}renderGarden();}
+function prestige(i){const h=G.habits[i];if(h.days<254)return;confirm('🌟 Вознести?','+10% монет +1 слот',()=>{if(!G.prestigeBonuses[h.flowerType])G.prestigeBonuses[h.flowerType]=0;G.prestigeBonuses[h.flowerType]+=0.1;if(!G.legendaryCollection)G.legendaryCollection=[];G.legendaryCollection.push({name:h.name,fn:h.flowerName,days:h.days});G.habits.splice(i,1);delete G.autoWater[i];G.maxSlots+=1;save();showToast('🌟 Вознесение!');renderGarden();});}
+function renameGarden(){const n=prompt('Название (в кавычках):\nМой Сад «...»',G.gardenQuote||'');if(n!==null){G.gardenQuote=n.trim();save();updateUI();}}
+function showAvatarPicker(){document.getElementById('avatarGrid').innerHTML=AVATARS.map(a=>`<div style="font-size:30px;cursor:pointer;padding:4px;border-radius:8px;border:2px solid ${G.pa===a?'var(--gold)':'transparent'}" onclick="G.pa='${a}';save();updateUI();closeM('mAvatar')">${a}</div>`).join('');showM('mAvatar');}
+function upSkill(id){const lv=G.skillLevels?.[id]||0;if(lv>=5){showToast('Максимум!');return;}const cost=10+(lv*5);if(G.petals<cost){alert(`Нужно ${cost}🌸!`);return;}G.petals-=cost;if(!G.skillLevels)G.skillLevels={};G.skillLevels[id]=lv+1;save();showToast(`🌟 Улучшено до ур.${lv+1}!`);updateUI();}
+
+function renderShop(){
+    const c=document.getElementById('shopC');
+    const cats=[
+        {t:'🌸 Цветы',i:FL.filter(x=>x.id!=='d'),inv:'flowers'},
+        {t:'🏺 Горшки',i:PT.filter(x=>x.id!=='d'),inv:'pots'},
+        {t:'🎀 Украшения',i:DC.filter(x=>x.id!=='none'),inv:'decorations'},
+        {t:'🐾 Питомцы',i:PS.filter(x=>x.id!=='none'),inv:'pets'},
+        {t:'🌍 Миры',i:WL.filter(x=>x.id!=='d'),inv:'worlds'}
+    ];
+    let h='';
+    cats.forEach(cat=>{
+        h+=`<div class="section-title">${cat.t}</div><div class="shop-grid">`;
+        cat.i.forEach(x=>{
+            const count=G.inv[cat.inv].filter(y=>y===x.id).length;
+            h+=`<div class="shop-item" onclick="confirmBuy('${cat.inv}','${x.id}',${x.p},'${x.c}','${x.n}','${x.e}')"><div class="shop-emoji">${x.e}</div><div class="shop-name">${x.n}</div><div class="shop-price ${x.c}">${x.p+(x.c==='coins'?'🪙':'💎')}</div>${count>0?`<div class="shop-count">${count}</div>`:''}</div>`;
+        });
+        h+='</div>';
+    });
+    c.innerHTML=h;
+}
+
+function confirmBuy(inv,id,p,cur,name,emoji){
+    if(inv==='worlds'&&G.inv.worlds.includes(id)){G.currentWorld=id;applyWorld(id);save();updateUI();showToast('🌍 Мир применён!');renderShop();return;}
+    if((cur==='coins'&&G.coins<p)||(cur==='diamonds'&&G.diamonds<p)){alert('Не хватает!');return;}
+    confirm('Покупка',`Купить ${emoji} ${name} за ${p}${cur==='coins'?'🪙':'💎'}?`,()=>{if(cur==='coins')G.coins-=p;else G.diamonds-=p;G.inv[inv].push(id);if(inv==='worlds'){G.currentWorld=id;applyWorld(id);}save();showToast('🛒 Куплено!');renderShop();});
+}
+
+function getQ(){const l=G.questLevel||0,td=G.habits.reduce((s,h)=>s+h.days,0),md=Math.max(...G.habits.map(h=>h.days),0),gc=(G.gallery||[]).length;const q=[{id:'a',n:'🌱 Посадить',d:`${1+l*2}`,p:()=>G.habits.length,g:1+l*2,r:5+l*5,cur:l%3===1?'diamonds':'coins'},{id:'b',n:'💧 Дней',d:`${2+l*4}`,p:()=>td,g:2+l*4,r:5+l*5,cur:l%3===2?'diamonds':'coins'},{id:'c',n:'🔥 Серия',d:`${2+l*2}`,p:()=>G.streak,g:2+l*2,r:3+l*3,cur:l%3===0?'diamonds':'coins'},{id:'d',n:'📅 Макс',d:`${3+l*5}`,p:()=>md,g:3+l*5,r:5+l*5,cur:'coins'}];if(l>=2)q.push({id:'e',n:'🏛️ Собрать',d:`${1+Math.floor(l/2)}`,p:()=>gc,g:1+Math.floor(l/2),r:8+l*3,cur:'diamonds'});return q;}
+function checkQ(){const q=getQ();let ad=true;q.forEach(x=>{const cid=x.id+'_'+G.questLevel;if(x.p()>=x.g&&!G.questsCompleted.includes(cid)){G.questsCompleted.push(cid);if(x.cur==='diamonds'){G.diamonds+=x.r;showToast(`📋 +${x.r}💎`);}else{G.coins+=x.r;showToast(`📋 +${x.r}🪙`);}}if(!G.questsCompleted.includes(cid))ad=false;});if(ad&&q.length>0){G.questLevel++;G.questsCompleted=[];showToast('⬆️ Новый уровень!');save();}}
+function renderQ(){const c=document.getElementById('questC'),q=getQ();document.getElementById('qLv').textContent=G.questLevel+1;c.innerHTML=q.map(x=>{const done=G.questsCompleted.includes(x.id+'_'+G.questLevel),p=Math.min(x.p(),x.g);return`<div class="card" style="opacity:${done?0.5:1}"><b>${x.n}</b> ${x.d} <span style="float:right">${p}/${x.g} ${done?'✅':`+${x.r}${x.cur==='diamonds'?'💎':'🪙'}`}</span></div>`;}).join('');}
+
+function getA(){
+    const l=getLevel(),gc=(G.gallery||[]).length,td=G.habits.reduce((s,h)=>s+h.days,0),md=Math.max(...G.habits.map(h=>h.days),0),st=G.streak||0,lc=(G.legendaryCollection||[]).length,pt=G.petals;
+    const a=[
+        {id:'h1',n:'Первая привычка',c:()=>G.habits.length>=1,cur:'coins',r:2},{id:'h3',n:'Три привычки',c:()=>G.habits.length>=3,cur:'coins',r:3},
+        {id:'h5',n:'Пять привычек',c:()=>G.habits.length>=5,cur:'diamonds',r:1},{id:'h10',n:'Десять привычек',c:()=>G.habits.length>=10,cur:'diamonds',r:2},
+        {id:'d5',n:'5 дней роста',c:()=>md>=5,cur:'coins',r:1},{id:'d30',n:'Месяц роста',c:()=>md>=30,cur:'diamonds',r:1},
+        {id:'d90',n:'3 месяца',c:()=>md>=90,cur:'diamonds',r:3},{id:'d254',n:'Мастер сада',c:()=>md>=254,cur:'diamonds',r:8},
+        {id:'s7',n:'Неделя подряд',c:()=>st>=7,cur:'diamonds',r:1},{id:'s30',n:'Месяц подряд',c:()=>st>=30,cur:'diamonds',r:3},
+        {id:'g1',n:'Первый урожай',c:()=>gc>=1,cur:'diamonds',r:1},{id:'t100',n:'100 дней всего',c:()=>td>=100,cur:'coins',r:5},
+        {id:'p1',n:'Первое вознесение',c:()=>lc>=1,cur:'diamonds',r:3},{id:'pt50',n:'50 лепестков',c:()=>pt>=50,cur:'diamonds',r:2}
+    ];
+    for(let i=5;i<=500;i+=5)a.push({id:'lv_'+i,n:`Уровень ${i}`,c:()=>l>=i,cur:i>=50?'diamonds':'coins',r:Math.floor(i/8)});
+    for(let i=500;i<=100000;i+=500)a.push({id:'td_'+i,n:`Всего дней: ${i}`,c:()=>td>=i,cur:'diamonds',r:Math.floor(i/300)});
+    for(let i=10;i<=1000;i+=10)a.push({id:'st_'+i,n:`Серия: ${i} дн.`,c:()=>st>=i,cur:'diamonds',r:Math.floor(i/30)});
+    for(let i=50;i<=5000;i+=50)a.push({id:'md_'+i,n:`Макс. дней: ${i}`,c:()=>md>=i,cur:'diamonds',r:Math.floor(i/40)});
+    for(let i=5;i<=300;i+=5)a.push({id:'gc_'+i,n:`Урожаев: ${i}`,c:()=>gc>=i,cur:'diamonds',r:Math.floor(i/15)});
+    return a;
+}
+function checkA(){getA().forEach(a=>{if(!G.achievements.includes(a.id)&&a.c()){G.achievements.push(a.id);if(a.cur==='diamonds'){G.diamonds+=a.r;showToast(`🏆 ${a.n}! +${a.r}💎`);}else{G.coins+=a.r;showToast(`🏆 ${a.n}! +${a.r}🪙`);}if(!G.collectionCards.find(c=>c.aid===a.id)){G.collectionCards.push({id:Date.now(),aid:a.id,rarity:a.r>=15?'diamond':a.r>=6?'gold':a.r>=3?'silver':'bronze',date:new Date().toLocaleDateString('ru-RU')});}}});}
+function renderA(){const c=document.getElementById('achContainer'),a=getA();document.getElementById('achC').textContent=G.achievements.length+'/'+a.length;c.innerHTML=a.slice(0,250).map(x=>{const u=G.achievements.includes(x.id);return`<div style="padding:6px;margin:2px 0;background:white;border-radius:6px;opacity:${u?1:0.4};font-size:10px">${u?'✅':'🔒'} <b>${x.n}</b> ${u?`+${x.r}${x.cur==='diamonds'?'💎':'🪙'}`:''}</div>`;}).join('');if(a.length>250)c.innerHTML+='<p style="text-align:center;font-size:10px">...и ещё '+(a.length-250)+'</p>';}
+
+function getBots(){const today=new Date().toDateString();if(localStorage.getItem(K+'_bd')===today&&window._bots)return window._bots;const bots=[];for(let i=0;i<15;i++){const n=BN[i],a=BA[i],r=Math.random(),l=r<.4?1+Math.floor(Math.random()*99):r<.75?100+Math.floor(Math.random()*400):500+Math.floor(Math.random()*500);const fc=1+Math.floor(l/20),fl=[];for(let j=0;j<fc&&j<10;j++){const fe=FL[Math.floor(Math.random()*FL.length)];fl.push({emoji:fe.e,name:fe.n,days:Math.floor(Math.random()*l*1.5)+1});}bots.push({_id:'b'+i,owner:n,avatar:a,gn:'🌸 Сад '+n,flowers:fl,likes:Math.floor(Math.random()*200),level:l,isBot:true});}localStorage.setItem(K+'_bd',today);window._bots=bots;return bots;}
+function renderWorld(){const c=document.getElementById('worldContainer'),local=JSON.parse(localStorage.getItem(K+'_worlds')||'[]'),bots=getBots(),all=[...local,...bots];all.sort((a,b)=>(b.level||0)-(a.level||0));if(!all.length){c.innerHTML='<p style="text-align:center;color:var(--text2)">Пока никто не поделился садом.</p>';return;}c.innerHTML=all.map(g=>{const liked=G.likedGardens.includes(g._id);return`<div class="card"><b>${g.gn}</b> ${g.avatar||'🌸'} (${g.owner||'Игрок'}) ${g.isBot?'🤖':''} • Ур.${g.level||'?'}<div style="font-size:20px">${(g.flowers||[]).map(f=>f.emoji||'🌸').join('')}</div><button class="btn btn-sm" style="${liked?'opacity:.5;background:var(--gold);':''}" onclick="likeGarden('${g._id}',${!!g.isBot})">❤️ ${g.likes||0}</button><button class="btn btn-sm" onclick="addFriend('${g._id}','${g.owner||'Игрок'}','${g.avatar||'🌸'}',${g.level||1})">🤝</button></div>`;}).join('');}
+function uploadGarden(){
+    if(G.gardenPublished){showToast('Вы уже публиковали свой сад!');return;}
+    if(!G.pn){alert('Укажите имя в профиле!');return;}
+    const local=JSON.parse(localStorage.getItem(K+'_worlds')||'[]');
+    local.push({_id:'u'+Date.now(),owner:G.pn,avatar:G.pa,gn:G.gardenQuote?`Мой Сад «${G.gardenQuote}»`:'Мой Сад',flowers:G.habits.map(h=>({emoji:getStage(h.days).e,name:h.flowerName,days:h.days})),likes:0,level:getLevel(),isBot:false});
+    localStorage.setItem(K+'_worlds',JSON.stringify(local));
+    G.gardenPublished=true;
+    save();
+    showToast('📤 Сад опубликован!');
+    renderWorld();
+}
+function likeGarden(id,isBot){if(G.likedGardens.includes(id))return;G.likedGardens.push(id);save();if(isBot){const bots=getBots();const g=bots.find(x=>x._id===id);if(g)g.likes=(g.likes||0)+1;}else{const local=JSON.parse(localStorage.getItem(K+'_worlds')||'[]');const g=local.find(x=>x._id===id);if(g)g.likes=(g.likes||0)+1;localStorage.setItem(K+'_worlds',JSON.stringify(local));}renderWorld();showToast('❤️ Лайк!');}
+function addFriend(id,name,avatar,level){if(!G.friends)G.friends=[];if(G.friends.find(f=>f.id===id)){showToast('Уже в друзьях!');return;}G.friends.push({id,name,avatar,level});save();showToast('🤝 Друг добавлен!');}
+
+function renderP(){
+    document.getElementById('wSel').innerHTML=WL.filter(x=>G.inv.worlds.includes(x.id)).map(x=>`<div onclick="G.currentWorld='${x.id}';applyWorld('${x.id}');save();renderP()" style="padding:8px;border-radius:10px;cursor:pointer;text-align:center;${G.currentWorld===x.id?'border:2px solid var(--gold)':''}"><div style="font-size:24px">${x.e}</div><div style="font-size:9px">${x.n}</div></div>`).join('');
+    document.getElementById('friendsList').innerHTML=(G.friends||[]).length?G.friends.map(f=>`<div class="card">${f.avatar||'🌸'} ${f.name} • Ур.${f.level}</div>`).join(''):'<p style="color:var(--text2)">Нет друзей</p>';
+}
+function renderGal(){const c=document.getElementById('galC');if(!G.gallery.length){c.innerHTML='<p style="text-align:center;grid-column:1/-1">Пусто</p>';return;}c.innerHTML=G.gallery.map(h=>`<div class="card" style="text-align:center"><div style="font-size:30px">🌸</div><b>${h.fn}</b><div style="font-size:9px">${h.days}дн</div></div>`).join('');}
+
+let cm=new Date().getMonth(),cy=new Date().getFullYear();
+function renderCal(){
+    document.getElementById('calT').textContent=new Date(cy,cm).toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+    const today=new Date().toDateString(),fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate(),sd=fd===0?6:fd-1;
+    let h='<div class="calendar-grid">';
+    ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(d=>h+=`<div style="font-weight:bold;font-size:9px">${d}</div>`);
+    for(let i=0;i<sd;i++)h+='<div></div>';
+    for(let d=1;d<=dim;d++){
+        const date=new Date(cy,cm,d).toDateString();
+        let cls='calendar-cell';
+        if(date===today)cls+=' today';
+        if(G.calendar&&G.calendar[date])cls+=' checked';
+        if(G.calNotes&&G.calNotes[date])cls+=' has-note';
+        if(G.wheelHistory&&G.wheelHistory[date])cls+=' has-balance';
+        h+=`<div class="${cls}" onclick="openCalNote('${date}')">${d}</div>`;
+    }
+    h+='</div>';
+    document.getElementById('calG').innerHTML=h;
+    updateCalNoteBox();
+}
+function chCal(d){cm+=d;if(cm<0){cm=11;cy--}if(cm>11){cm=0;cy++}renderCal();}
+function openCalNote(date){
+    const today=new Date().toDateString();
+    if(date===today && G.selectedCalDate===date){
+        G.selectedMood='😊';
+        document.getElementById('cnDate').textContent=new Date(date).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+        document.getElementById('cnText').value='';
+        renderMoodPicker();
+        showM('mCalNote');
+        return;
+    }
+    G.selectedCalDate=date;
+    updateCalNoteBox();
+    renderCal();
+}
+function renderMoodPicker(){document.getElementById('moodPick').innerHTML=MOODS.map(m=>`<span class="mood-emoji${G.selectedMood===m?' selected':''}" onclick="G.selectedMood='${m}';renderMoodPicker()">${m}</span>`).join('');}
+function saveCalNote(){const date=G.selectedCalDate;if(!date)return;const text=document.getElementById('cnText').value.trim();if(!text)return;if(!G.calNotes)G.calNotes={};if(!G.calNotes[date])G.calNotes[date]=[];G.calNotes[date].push({mood:G.selectedMood,text,time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})});if(!G.calendar)G.calendar={};G.calendar[date]=true;closeM('mCalNote');save();renderCal();showToast('📝 Сохранено!');}
+function updateCalNoteBox(){const box=document.getElementById('calNoteBox');if(!G.selectedCalDate){box.innerHTML='';return;}const date=G.selectedCalDate,notes=(G.calNotes||{})[date]||[],wheel=G.wheelHistory?.[date],today=new Date().toDateString();let h='';if(wheel){h+='<b>🎡 Баланс дня:</b>'+wheel.map(w=>`<div style="font-size:11px">${w.area}: ${w.value}/10</div>`).join('');}if(notes.length){h+='<b>📝 Заметки:</b>'+notes.map((n,i)=>`<div class="card" style="padding:8px;margin:4px 0;position:relative"><span style="font-size:18px">${n.mood}</span> <small>${n.time}</small><p>${n.text}</p>${date===today?`<span onclick="delCalNote('${date}',${i})" style="position:absolute;top:4px;right:8px;color:red;cursor:pointer">✕</span>`:''}</div>`).join('');}if(!h)h='<p style="font-size:10px;color:var(--text2)">Нет записей</p>';box.innerHTML=h;}
+function delCalNote(date,i){if(!G.calNotes||!G.calNotes[date])return;G.calNotes[date].splice(i,1);if(!G.calNotes[date].length)delete G.calNotes[date];save();renderCal();showToast('🗑️ Удалено');}
+
+function renderD(){
+    document.getElementById('fBar').innerHTML=G.diaryFolders.map(f=>`<span class="folder-tag${f===G.currentFolder?' active':''}" onclick="G.currentFolder='${f}';save();renderD()">${f}<span class="folder-delete" onclick="event.stopPropagation();delF('${f}')">✕</span></span>`).join('');
+    const e=G.diary.filter(x=>x.folder===G.currentFolder||(!x.folder&&G.currentFolder==='Общее'));const c=document.getElementById('dEnt');
+    if(!e.length){c.innerHTML='<p style="color:var(--text2)">Нет записей</p>';return;}
+    c.innerHTML=e.sort((a,b)=>b.id-a.id).slice(0,20).map(x=>`<div class="card" style="position:relative;padding-right:50px"><div style="font-size:8px;color:var(--text2)">${x.date} ${x.time||''}</div><p>${x.text}</p><span onclick="delDE(${x.id})" style="position:absolute;top:8px;right:8px;color:red;cursor:pointer;font-size:18px">✕</span><span onclick="showMove(${x.id})" style="position:absolute;bottom:8px;right:8px;cursor:pointer;font-size:14px">📁</span></div>`).join('');
+}
+function saveD(){const t=document.getElementById('dText').value.trim();if(!t)return;G.diary.push({id:Date.now(),text:t,folder:G.currentFolder,date:new Date().toLocaleDateString('ru-RU'),time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})});document.getElementById('dText').value='';save();renderD();showToast('📔 Сохранено!');}
+function delDE(id){if(confirm('Удалить?')){G.diary=G.diary.filter(x=>x.id!==id);save();renderD();}}
+function addF(){const n=prompt('Папка:');if(n&&n.trim()&&!G.diaryFolders.includes(n.trim())){G.diaryFolders.push(n.trim());save();renderD();}}
+function delF(f){if(confirm(`Удалить "${f}"?`)){G.diary=G.diary.filter(x=>x.folder!==f);G.diaryFolders=G.diaryFolders.filter(x=>x!==f);if(G.currentFolder===f)G.currentFolder='Общее';save();renderD();}}
+function showMove(id){document.getElementById('moveId').value=id;const folders=G.diaryFolders.filter(f=>f!==G.currentFolder);const list=document.getElementById('moveList');if(folders.length===0){list.innerHTML='<p style="text-align:center;color:var(--text2)">Нет других папок</p>';}else{list.innerHTML=folders.map(f=>`<div class="card" style="cursor:pointer;text-align:center" onclick="moveDiary('${f}')">📁 ${f}</div>`).join('');}showM('mMove');}
+function moveDiary(folder){const id=parseInt(document.getElementById('moveId').value);const e=G.diary.find(x=>x.id===id);if(e){e.folder=folder;closeM('mMove');save();renderD();showToast('📁 Перемещено!');}}
+
+function showCards(){const h='<h3>🃏 Карточки</h3>';if(!G.collectionCards.length)showMC(h+'<p>Нет</p>');else{let cards='';G.collectionCards.forEach(c=>{const rc=c.rarity==='diamond'?'#b9f2ff':c.rarity==='gold'?'gold':'#cd7f32';cards+=`<div class="card" style="border-left:4px solid ${rc}">${c.rarity==='diamond'?'💎':c.rarity==='gold'?'👑':'⭐'} ${c.date}</div>`;});showMC(h+cards);}}
+function showExpand(){const p=G.gardenPlots||1,costs=[0,200,800,2000];let h='<h3>🏡 Участки</h3><p>Участков: '+p+'/4</p>';for(let i=1;i<=4;i++){if(i<=p)h+=`<div style="padding:8px;background:#e8f5e0;border-radius:6px;margin:3px 0">✅ Участок ${i}</div>`;else if(i===p+1)h+=`<div onclick="expG()" style="padding:8px;border:2px dashed #ccc;border-radius:6px;margin:3px 0;cursor:pointer">🔒 ${costs[i-1]}🪙 (+2 слота)</div>`;else h+=`<div style="padding:8px;opacity:0.3">🔒</div>`;}showMC(h);}
+function expG(){const c=[0,200,800,2000],p=G.gardenPlots||1;if(G.coins<c[p]){alert('Не хватает!');return;}confirm('Расширить?',`${c[p]}🪙`,()=>{G.coins-=c[p];G.gardenPlots=p+1;G.maxSlots+=2;save();showToast('🏡 Расширено!');showExpand();});}
+function showClub(){const clubs=JSON.parse(localStorage.getItem('bc')||'[]');let h='<h3>🏰 Клубы</h3>';if(!G.clubMembership){if(!clubs.length)h+='<p>Нет</p>';else clubs.forEach(c=>{h+=`<div class="card"><b>${c.name}</b> - ${c.members.length} уч. <button class="btn btn-sm btn-primary" onclick="jClub(${c.id})">Войти</button></div>`;});h+='<button class="btn btn-primary btn-block" onclick="cClub()">✨ Создать (100🪙)</button>';}else{const c=clubs.find(x=>x.id===G.clubMembership);if(c){h+=`<h4>${c.name}</h4><p>${c.members.length} уч.</p><button class="btn btn-sm" style="color:red" onclick="lClub()">Покинуть</button>`;}}showMC(h);}
+function cClub(){if(G.coins<100){alert('100🪙!');return;}const n=prompt('Название:');if(!n)return;G.coins-=100;const clubs=JSON.parse(localStorage.getItem('bc')||'[]');clubs.push({id:Date.now(),name:n,members:[{name:G.pn||'Игрок'}]});localStorage.setItem('bc',JSON.stringify(clubs));G.clubMembership=clubs[clubs.length-1].id;save();showToast('🏰 Создан!');showClub();}
+function jClub(id){const clubs=JSON.parse(localStorage.getItem('bc')||'[]'),c=clubs.find(x=>x.id===id);if(c){c.members.push({name:G.pn||'Игрок'});localStorage.setItem('bc',JSON.stringify(clubs));G.clubMembership=id;save();showToast('🤝 Вступили!');showClub();}}
+function lClub(){const clubs=JSON.parse(localStorage.getItem('bc')||'[]'),c=clubs.find(x=>x.id===G.clubMembership);if(c){c.members=c.members.filter(m=>m.name!==(G.pn||'Игрок'));if(!c.members.length)localStorage.setItem('bc',JSON.stringify(clubs.filter(x=>x.id!==c.id)));else localStorage.setItem('bc',JSON.stringify(clubs));}delete G.clubMembership;save();showToast('👋 Вышли');showClub();}
+function showStats(){const td=G.habits.reduce((s,h)=>s+h.days,0);showMC(`<h3>📊 Статистика</h3><div class="card"><p>📅 Дней: <b>${td}</b></p><p>🏛️ Собрано: <b>${(G.gallery||[]).length}</b></p><p>🏆 Достижений: <b>${G.achievements.length}</b></p><p>🌸 Лепестков: <b>${G.petals}</b></p></div>`);}
+
+function startMeditation(){
+    const now=Date.now();
+    if(now-(G.lastBreathTime||0)<300000){showToast('⏳ Подожди 5 минут!');return;}
+    G.lastBreathTime=now;save();updateUI();
+    const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,rgba(245,240,250,.97),rgba(232,223,240,.97));z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center';
+    o.innerHTML=`<h2 style="color:var(--gold)">🧘 Дыхание</h2><div class="breath-circle" id="bc">🌸</div><p id="bt">Вдох...</p><p>Циклов: <span id="bcc">0</span>/3</p><button class="btn btn-outline btn-sm" onclick="this.parentElement.remove()">Завершить</button>`;
+    document.body.appendChild(o);let cyc=0,phase='inhale';const circle=document.getElementById('bc'),text=document.getElementById('bt'),count=document.getElementById('bcc');
+    function run(){if(cyc>=3){o.remove();G.petals+=3;save();showToast('🧘 +3🌸');return;}if(phase==='inhale'){circle.classList.add('inhale');text.textContent='🌬️ Вдох (2с)';setTimeout(()=>{phase='hold';run();},2000);}else if(phase==='hold'){text.textContent='⏸️ Задержка (1.5с)';setTimeout(()=>{phase='exhale';run();},1500);}else{circle.classList.add('exhale');text.textContent='💨 Выдох (3с)';setTimeout(()=>{phase='inhale';cyc++;count.textContent=cyc;run();},3000);}}
+    setTimeout(run,1500);
+}
+function startWheel(){
+    const today=new Date().toDateString();
+    if(G.lastWheelDate===today){showToast('🎡 Баланс уже пройден сегодня!');return;}
+    const areas=['Здоровье','Работа','Отдых','Спорт','Хобби','Общение'];const ratings={};areas.forEach(a=>ratings[a]=5);let ca=0;
+    const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white';
+    o.innerHTML=`<h2 style="color:var(--gold)">🎡 Колесо баланса</h2><p style="font-size:12px;margin:8px">Отвечайте честно</p><h3 id="waArea" style="font-size:20px">${areas[0]}</h3><input type="range" min="1" max="10" value="5" id="waR" style="width:200px"><p id="waV" style="font-size:18px;font-weight:bold">5</p><button class="btn btn-primary" id="waN">Далее</button>`;
+    document.body.appendChild(o);document.getElementById('waR').oninput=function(){document.getElementById('waV').textContent=this.value;};
+    document.getElementById('waN').onclick=function(){
+        ratings[areas[ca]]=parseInt(document.getElementById('waR').value);ca++;
+        if(ca>=areas.length){o.remove();G.lastWheelDate=today;G.wheelHistory[today]=areas.map(a=>({area:a,value:ratings[a]}));G.petals+=5;save();showToast('🎡 +5🌸 Баланс сохранён!');}
+        else{document.getElementById('waArea').textContent=areas[ca];document.getElementById('waR').value=5;document.getElementById('waV').textContent='5';}
+    };
+}
+
+function showMC(h){const m=document.createElement('div');m.className='modal active';m.innerHTML=`<div class="modal-content">${h}<button class="btn btn-outline btn-block" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m);}
+function exportS(){const d={game:G},b=new Blob([JSON.stringify(d)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='bloom-save.json';a.click();showToast('💾 Готово!');}
+function importS(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);confirm('Загрузить?','Прогресс заменён',()=>{G={...G,...d.game};save();updateUI();renderGarden();showToast('📥 Готово!');});}catch(err){alert('Ошибка!');}};r.readAsText(e.target.files[0]);};i.click();}
+
+function checkDay(){
+    const today=new Date().toDateString();
+    if(G.lastDate!==today){
+        G.streak=(G.lastDate===new Date(Date.now()-86400000).toDateString())?G.streak+1:1;G.lastDate=today;
+        let autoWatered=false;
+        G.habits.forEach((h,i)=>{if(G.autoWater[i]&&h.lastDone!==today){h.days++;h.lastDone=today;h.daysSinceWatered=0;G.calendar[today]=true;const f=FL.find(x=>x.id===h.flowerType)||FL[0];if(f.ct==='diamonds')G.diamonds+=f.inc;else G.coins+=f.inc;G.petals++;autoWatered=true;}});
+        G.habits.forEach(h=>{if(h.lastDone&&h.lastDone!==today)h.daysSinceWatered=Math.floor((new Date(today)-new Date(h.lastDone))/86400000);});
+        const dead=G.habits.filter(h=>h.daysSinceWatered>=45);
+        if(dead.length){G.habits=G.habits.filter(h=>h.daysSinceWatered<45);dead.forEach(h=>showToast(`🥀 ${h.flowerName} погиб!`));}
+        save();if(autoWatered)showToast('🤖 Автополив выполнен!');
+    }
+}
+
+loadGame();
+checkDay();
+updateUI();
+renderGarden();
+if(G.musicOn)startMusic();
+setInterval(()=>{checkDay();updateUI();if(cs==='garden')renderGarden();},60000);
+</script>
+</body>
+</html>
